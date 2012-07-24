@@ -1,14 +1,12 @@
 
 #include <iostream>
+#include <iomanip>
 #include <string.h>
 #include "CP1610.h"
 #include "../core/osd/types.h"
-#include <iomanip>
 
 #pragma warning(disable:4786)	// Suppress STL debug info > 255 chars messages
 using namespace std;
-
-ofstream CP1610_log;
 
 CP1610::CP1610()
 {
@@ -142,11 +140,13 @@ INT32 CP1610::getIndirect(INT32 registerNum) {
 }
 
 void CP1610::HLT() {
+	log << "HLT" << endl;
     //halted = TRUE;
     usedCycles += 1;
 }
 
 void CP1610::SDBD() {
+	log << "SDBD" << endl;
     r[7] = (r[7]+1) & 0xFFFF;
     interruptible = FALSE;
 
@@ -156,6 +156,7 @@ void CP1610::SDBD() {
 }
 
 void CP1610::EIS() {
+	log << "EIS" << endl;
     r[7] = (r[7]+1) & 0xFFFF;
     interruptible = FALSE;
 
@@ -165,6 +166,7 @@ void CP1610::EIS() {
 }
 
 void CP1610::DIS() {
+	log << "DIS" << endl;
     r[7] = (r[7]+1) & 0xFFFF;
     interruptible = FALSE;
 
@@ -174,6 +176,7 @@ void CP1610::DIS() {
 }
 
 void CP1610::TCI() {
+	log << "TCI" << endl;
     r[7] = (r[7]+1) & 0xFFFF;
     interruptible = FALSE;
 
@@ -183,6 +186,7 @@ void CP1610::TCI() {
 }
 
 void CP1610::CLRC() {
+	log << "CLRC" << endl;
     r[7] = (r[7]+1) & 0xFFFF;
     interruptible = FALSE;
 
@@ -192,6 +196,7 @@ void CP1610::CLRC() {
 }
 
 void CP1610::SETC() {
+	log << "SETC" << endl;
     r[7] = (r[7]+1) & 0xFFFF;
     interruptible = FALSE;
 
@@ -201,12 +206,14 @@ void CP1610::SETC() {
 }
 
 void CP1610::J(INT32 target) {
+	log << "J $" << uppercase << hex << setw(4) << setfill('0') << target << endl;
     r[7] = target;
 
     usedCycles += 12;
 }
 
 void CP1610::JSR(INT32 registerNum, INT32 target) {
+	log << "JSR R" << registerNum << ", $" << uppercase << hex << setw(4) << setfill('0') << target << endl;
     r[7] = (r[7]+3) & 0xFFFF;
 
     r[registerNum] = r[7];
@@ -216,6 +223,7 @@ void CP1610::JSR(INT32 registerNum, INT32 target) {
 }
 
 void CP1610::JE(INT32 target) {
+	log << "JE $" << uppercase << hex << setw(4) << setfill('0') << target << endl;
     I = TRUE;
     r[7] = target;
 
@@ -223,6 +231,7 @@ void CP1610::JE(INT32 target) {
 }
 
 void CP1610::JSRE(INT32 registerNum, INT32 target) {
+	log << "JSRE R" << registerNum << ", $" << uppercase << hex << setw(4) << setfill('0') << target << endl;
     r[7] = (r[7]+3) & 0xFFFF;
 
     I = TRUE;
@@ -233,6 +242,7 @@ void CP1610::JSRE(INT32 registerNum, INT32 target) {
 }
 
 void CP1610::JD(INT32 target) {
+	log << "JD $" << uppercase << hex << setw(4) << setfill('0') << target << endl;
     I = FALSE;
     r[7] = target;
 
@@ -240,6 +250,7 @@ void CP1610::JD(INT32 target) {
 }
 
 void CP1610::JSRD(INT32 registerNum, INT32 target) {
+	log << "JSRD R" << registerNum << ", $" << uppercase << hex << setw(4) << setfill('0') << target << endl;
     r[7] = (r[7]+3) & 0xFFFF;
 
     I = FALSE;
@@ -250,6 +261,7 @@ void CP1610::JSRD(INT32 registerNum, INT32 target) {
 }
 
 void CP1610::INCR(INT32 registerNum) {
+	log << "INCR R" << registerNum << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     INT32 newValue = (r[registerNum]+1) & 0xFFFF;
@@ -261,6 +273,7 @@ void CP1610::INCR(INT32 registerNum) {
 }
 
 void CP1610::DECR(INT32 registerNum) {
+	log << "DECR R" << registerNum << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     INT32 newValue = (r[registerNum] + 0xFFFF) & 0xFFFF;
@@ -272,6 +285,7 @@ void CP1610::DECR(INT32 registerNum) {
 }
 
 void CP1610::NEGR(INT32 registerNum) {
+	log << "NEGR R" << registerNum << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     INT32 op1 = r[registerNum];
@@ -287,6 +301,7 @@ void CP1610::NEGR(INT32 registerNum) {
 }
 
 void CP1610::ADCR(INT32 registerNum) {
+	log << "ADCR R" << registerNum << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     INT32 op1 = r[registerNum];
@@ -303,6 +318,7 @@ void CP1610::ADCR(INT32 registerNum) {
 }
 
 void CP1610::RSWD(INT32 registerNum) {
+	log << "RSWD R" << registerNum << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     INT32 value = r[registerNum];
@@ -315,6 +331,7 @@ void CP1610::RSWD(INT32 registerNum) {
 }
 
 void CP1610::GSWD(INT32 registerNum) {
+	log << "GSWD R" << registerNum << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     INT32 value = (((S ? 1 : 0) << 7) |
@@ -328,12 +345,20 @@ void CP1610::GSWD(INT32 registerNum) {
 }
 
 void CP1610::NOP(INT32 twoOption) {
+	log << "NOP";
+	if (twoOption == 1)
+		log << " 1";
+	log << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     usedCycles += 6;
 }
 
 void CP1610::SIN(INT32 twoOption) {
+	log << "SIN";
+	if (twoOption == 1)
+		log << " 1";
+	log << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     //TODO: does SIN need to do anything?!
@@ -342,6 +367,10 @@ void CP1610::SIN(INT32 twoOption) {
 }
 
 void CP1610::SWAP(INT32 shift, INT32 registerNum) {
+	log << "SWAP R" << registerNum;
+	if (shift == 1)
+		log << ", 1";
+	log << endl;
     r[7] = (r[7]+1) & 0xFFFF;
     interruptible = FALSE;
 
@@ -366,6 +395,7 @@ void CP1610::SWAP(INT32 shift, INT32 registerNum) {
 }
 
 void CP1610::COMR(INT32 registerNum) {
+	log << "COMR R" << registerNum << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     INT32 newValue = r[registerNum] ^ 0xFFFF;
@@ -377,6 +407,10 @@ void CP1610::COMR(INT32 registerNum) {
 }
 
 void CP1610::SLL(INT32 shift, INT32 registerNum) {
+	log << "SLL R" << registerNum;
+	if (shift == 1)
+		log << ", 1";
+	log << endl;
     r[7] = (r[7]+1) & 0xFFFF;
     interruptible = FALSE;
 
@@ -401,6 +435,10 @@ void CP1610::SLL(INT32 shift, INT32 registerNum) {
 }
 
 void CP1610::RLC(INT32 shift, INT32 registerNum) {
+	log << "RLC R" << registerNum;
+	if (shift == 1)
+		log << ", 1";
+	log << endl;
     r[7] = (r[7]+1) & 0xFFFF;
     interruptible = FALSE;
 
@@ -431,6 +469,10 @@ void CP1610::RLC(INT32 shift, INT32 registerNum) {
 }
 
 void CP1610::SLLC(INT32 shift, INT32 registerNum) {
+	log << "SLLC R" << registerNum;
+	if (shift == 1)
+		log << ", 1";
+	log << endl;
     r[7] = (r[7]+1) & 0xFFFF;
     interruptible = FALSE;
 
@@ -458,6 +500,10 @@ void CP1610::SLLC(INT32 shift, INT32 registerNum) {
 }
 
 void CP1610::SLR(INT32 shift, INT32 registerNum) {
+	log << "SLR R" << registerNum;
+	if (shift == 1)
+		log << ", 1";
+	log << endl;
     r[7] = (r[7]+1) & 0xFFFF;
     interruptible = FALSE;
 
@@ -482,6 +528,10 @@ void CP1610::SLR(INT32 shift, INT32 registerNum) {
 }
 
 void CP1610::SAR(INT32 shift, INT32 registerNum) {
+	log << "SAR R" << registerNum;
+	if (shift == 1)
+		log << ", 1";
+	log << endl;
     r[7] = (r[7]+1) & 0xFFFF;
     interruptible = FALSE;
 
@@ -507,6 +557,10 @@ void CP1610::SAR(INT32 shift, INT32 registerNum) {
 }
 
 void CP1610::RRC(INT32 shift, INT32 registerNum) {
+	log << "RRC R" << registerNum;
+	if (shift == 1)
+		log << ", 1";
+	log << endl;
     r[7] = (r[7]+1) & 0xFFFF;
     interruptible = FALSE;
 
@@ -537,6 +591,10 @@ void CP1610::RRC(INT32 shift, INT32 registerNum) {
 }
 
 void CP1610::SARC(INT32 shift, INT32 registerNum) {
+	log << "SARC R" << registerNum;
+	if (shift == 1)
+		log << ", 1";
+	log << endl;
     r[7] = (r[7]+1) & 0xFFFF;
     interruptible = FALSE;
 
@@ -565,6 +623,7 @@ void CP1610::SARC(INT32 shift, INT32 registerNum) {
 }
 
 void CP1610::MOVR(INT32 sourceReg, INT32 destReg) {
+	log << "MOVR R" << sourceReg << ", R" << destReg << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     INT32 value = r[sourceReg];
@@ -576,6 +635,7 @@ void CP1610::MOVR(INT32 sourceReg, INT32 destReg) {
 }
 
 void CP1610::ADDR(INT32 sourceReg, INT32 destReg) {
+	log << "ADDR R" << sourceReg << ", R" << destReg << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     INT32 op1 = r[sourceReg];
@@ -592,6 +652,7 @@ void CP1610::ADDR(INT32 sourceReg, INT32 destReg) {
 }
 
 void CP1610::SUBR(INT32 sourceReg, INT32 destReg) {
+	log << "SUBR R" << sourceReg << ", R" << destReg << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     INT32 op1 = r[sourceReg];
@@ -608,6 +669,7 @@ void CP1610::SUBR(INT32 sourceReg, INT32 destReg) {
 }
 
 void CP1610::CMPR(INT32 sourceReg, INT32 destReg) {
+	log << "CMPR R" << sourceReg << ", R" << destReg << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     INT32 op1 = r[sourceReg];
@@ -623,6 +685,7 @@ void CP1610::CMPR(INT32 sourceReg, INT32 destReg) {
 }
 
 void CP1610::ANDR(INT32 sourceReg, INT32 destReg) {
+	log << "ANDR R" << sourceReg << ", R" << destReg << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     INT32 newValue = r[destReg];
@@ -635,6 +698,7 @@ void CP1610::ANDR(INT32 sourceReg, INT32 destReg) {
 }
 
 void CP1610::XORR(INT32 sourceReg, INT32 destReg) {
+	log << "XORR R" << sourceReg << ", R" << destReg << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     INT32 newValue = r[destReg] ^ r[sourceReg];
@@ -646,6 +710,8 @@ void CP1610::XORR(INT32 sourceReg, INT32 destReg) {
 }
 
 void CP1610::BEXT(INT32 condition, INT32 displacement) {
+	log << "BEXT $" << uppercase << hex << setw(4) << setfill('0') << displacement << ", $" << uppercase << hex << condition
+		<< endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     if (ext == condition) {
@@ -657,6 +723,7 @@ void CP1610::BEXT(INT32 condition, INT32 displacement) {
 }
 
 void CP1610::B(INT32 displacement) {
+	log << "B $" << uppercase << hex << setw(4) << setfill('0') << displacement << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     r[7] = (r[7]+displacement) & 0xFFFF;
@@ -665,12 +732,14 @@ void CP1610::B(INT32 displacement) {
 }
 
 void CP1610::NOPP(INT32 displacement) {
+	log << "NOPP" << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     usedCycles += 7;
 }
 
 void CP1610::BC(INT32 displacement) {
+	log << "BC $" << uppercase << hex << setw(4) << setfill('0') << displacement << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     if (C) {
@@ -682,6 +751,7 @@ void CP1610::BC(INT32 displacement) {
 }
 
 void CP1610::BNC(INT32 displacement) {
+	log << "BNC $" << uppercase << hex << setw(4) << setfill('0') << displacement << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     if (!C) {
@@ -693,6 +763,7 @@ void CP1610::BNC(INT32 displacement) {
 }
 
 void CP1610::BOV(INT32 displacement) {
+	log << "BOV $" << uppercase << hex << setw(4) << setfill('0') << displacement << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     if (O) {
@@ -704,6 +775,7 @@ void CP1610::BOV(INT32 displacement) {
 }
 
 void CP1610::BNOV(INT32 displacement) {
+	log << "BNOV $" << uppercase << hex << setw(4) << setfill('0') << displacement << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     if (!O) {
@@ -715,6 +787,7 @@ void CP1610::BNOV(INT32 displacement) {
 }
 
 void CP1610::BPL(INT32 displacement) {
+	log << "BPL $" << uppercase << hex << setw(4) << setfill('0') << displacement << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     if (!S) {
@@ -726,6 +799,7 @@ void CP1610::BPL(INT32 displacement) {
 }
 
 void CP1610::BMI(INT32 displacement) {
+	log << "BMI $" << uppercase << hex << setw(4) << setfill('0') << displacement << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     if (S) {
@@ -737,6 +811,7 @@ void CP1610::BMI(INT32 displacement) {
 }
 
 void CP1610::BEQ(INT32 displacement) {
+	log << "BEQ $" << uppercase << hex << setw(4) << setfill('0') << displacement << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     if (Z) {
@@ -748,6 +823,7 @@ void CP1610::BEQ(INT32 displacement) {
 }
 
 void CP1610::BNEQ(INT32 displacement) {
+	log << "BNEQ $" << uppercase << hex << setw(4) << setfill('0') << displacement << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     if (!Z) {
@@ -759,6 +835,7 @@ void CP1610::BNEQ(INT32 displacement) {
 }
 
 void CP1610::BLT(INT32 displacement) {
+	log << "BLT $" << uppercase << hex << setw(4) << setfill('0') << displacement << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     if (S != O) {
@@ -770,6 +847,7 @@ void CP1610::BLT(INT32 displacement) {
 }
 
 void CP1610::BGE(INT32 displacement) {
+	log << "BGE $" << uppercase << hex << setw(4) << setfill('0') << displacement << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     if (S == O) {
@@ -781,6 +859,7 @@ void CP1610::BGE(INT32 displacement) {
 }
 
 void CP1610::BLE(INT32 displacement) {
+	log << "BLE $" << uppercase << hex << setw(4) << setfill('0') << displacement << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     if (Z || (S != O)) {
@@ -792,6 +871,7 @@ void CP1610::BLE(INT32 displacement) {
 }
 
 void CP1610::BGT(INT32 displacement) {
+	log << "BGT $" << uppercase << hex << setw(4) << setfill('0') << displacement << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     if (!(Z || (S != O))) {
@@ -803,6 +883,7 @@ void CP1610::BGT(INT32 displacement) {
 }
 
 void CP1610::BUSC(INT32 displacement) {
+	log << "BUSC $" << uppercase << hex << setw(4) << setfill('0') << displacement << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     if (C != S) {
@@ -814,6 +895,7 @@ void CP1610::BUSC(INT32 displacement) {
 }
 
 void CP1610::BESC(INT32 displacement) {
+	log << "BESC $" << uppercase << hex << setw(4) << setfill('0') << displacement << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     if (C == S) {
@@ -825,6 +907,7 @@ void CP1610::BESC(INT32 displacement) {
 }
 
 void CP1610::MVO(INT32 registerNum, INT32 address) {
+	log << "MVO R" << registerNum << ", $" << uppercase << hex << setw(4) << setfill('0') << address << endl;
     r[7] = (r[7]+2) & 0xFFFF;
     interruptible = FALSE;
 
@@ -834,6 +917,7 @@ void CP1610::MVO(INT32 registerNum, INT32 address) {
 }
 
 void CP1610::MVO_ind(INT32 registerWithAddress, INT32 registerToMove) {
+	log << "MVO@ R" << registerToMove << ", R" << registerWithAddress << endl;
     r[7] = (r[7]+1) & 0xFFFF;
     interruptible = FALSE;
 
@@ -843,6 +927,7 @@ void CP1610::MVO_ind(INT32 registerWithAddress, INT32 registerToMove) {
 }
 
 void CP1610::MVI(INT32 address, INT32 registerNum) {
+	log << "MVI R" << registerNum << ", $" << uppercase << hex << setw(4) << setfill('0') << address << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     r[registerNum] = memoryBus->peek(address);
@@ -851,6 +936,7 @@ void CP1610::MVI(INT32 address, INT32 registerNum) {
 }
 
 void CP1610::MVI_ind(INT32 registerWithAddress, INT32 registerToReceive) {
+	log << "MVI@ R" << registerWithAddress << ", R" << registerToReceive << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     INT32 address = getIndirect(registerWithAddress);
@@ -860,6 +946,7 @@ void CP1610::MVI_ind(INT32 registerWithAddress, INT32 registerToReceive) {
 }
 
 void CP1610::ADD(INT32 address, INT32 registerNum) {
+	log << "ADD R" << registerNum << ", $" << uppercase << hex << setw(4) << setfill('0') << address << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     INT32 op1 = memoryBus->peek(address);
@@ -876,6 +963,7 @@ void CP1610::ADD(INT32 address, INT32 registerNum) {
 }
 
 void CP1610::ADD_ind(INT32 registerWithAddress, INT32 registerToReceive) {
+	log << "ADD@ R" << registerWithAddress << ", R" << registerToReceive << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     INT32 op1 = getIndirect(registerWithAddress);
@@ -892,6 +980,7 @@ void CP1610::ADD_ind(INT32 registerWithAddress, INT32 registerToReceive) {
 }
 
 void CP1610::SUB(INT32 address, INT32 registerNum) {
+	log << "SUB R" << registerNum << ", $" << uppercase << hex << setw(4) << setfill('0') << address << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     INT32 op1 = memoryBus->peek(address);
@@ -908,6 +997,7 @@ void CP1610::SUB(INT32 address, INT32 registerNum) {
 }
 
 void CP1610::SUB_ind(INT32 registerWithAddress, INT32 registerToReceive) {
+	log << "SUB@ R" << registerWithAddress << ", R" << registerToReceive << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     INT32 op1 = getIndirect(registerWithAddress);
@@ -924,6 +1014,7 @@ void CP1610::SUB_ind(INT32 registerWithAddress, INT32 registerToReceive) {
 }
 
 void CP1610::CMP(INT32 address, INT32 registerNum) {
+	log << "CMP R" << registerNum << ", $" << uppercase << hex << setw(4) << setfill('0') << address << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     INT32 op1 = memoryBus->peek(address);
@@ -939,6 +1030,7 @@ void CP1610::CMP(INT32 address, INT32 registerNum) {
 }
 
 void CP1610::CMP_ind(INT32 registerWithAddress, INT32 registerToReceive) {
+	log << "CMP@ R" << registerWithAddress << ", R" << registerToReceive << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     INT32 op1 = getIndirect(registerWithAddress);
@@ -954,6 +1046,7 @@ void CP1610::CMP_ind(INT32 registerWithAddress, INT32 registerToReceive) {
 }
 
 void CP1610::AND(INT32 address, INT32 registerNum) {
+	log << "AND R" << registerNum << ", $" << uppercase << hex << setw(4) << setfill('0') << address << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     INT32 value = memoryBus->peek(address);
@@ -966,6 +1059,7 @@ void CP1610::AND(INT32 address, INT32 registerNum) {
 }
 
 void CP1610::AND_ind(INT32 registerWithAddress, INT32 registerToReceive) {
+	log << "AND@ R" << registerWithAddress << ", R" << registerToReceive << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     INT32 value = getIndirect(registerWithAddress);
@@ -978,6 +1072,7 @@ void CP1610::AND_ind(INT32 registerWithAddress, INT32 registerToReceive) {
 }
 
 void CP1610::XOR(INT32 address, INT32 registerNum) {
+	log << "XOR R" << registerNum << ", $" << uppercase << hex << setw(4) << setfill('0') << address << endl;
     r[7] = (r[7]+2) & 0xFFFF;
 
     INT32 value = memoryBus->peek(address);
@@ -990,6 +1085,7 @@ void CP1610::XOR(INT32 address, INT32 registerNum) {
 }
 
 void CP1610::XOR_ind(INT32 registerWithAddress, INT32 registerToReceive) {
+	log << "XOR@ R" << registerWithAddress << ", R" << registerToReceive << endl;
     r[7] = (r[7]+1) & 0xFFFF;
 
     INT32 value = getIndirect(registerWithAddress);
@@ -1006,7 +1102,6 @@ void CP1610::decode(INT32 op) {
     INT32 registerNum;
     INT32 interrupt;
     INT32 target;
-	log << uppercase << hex << setw(3) << setfill('0') << op << endl;
     switch (op) {
         case 0x0000:
             HLT();
