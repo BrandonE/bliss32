@@ -5,6 +5,7 @@
 #include "../core/MemoryBus.h"
 #include "../core/Processor.h"
 #include "../core/SignalLine.h"
+#include <fstream>
 
 class CP1610 : public Processor
 {
@@ -16,6 +17,7 @@ class CP1610 : public Processor
                 INT32 resetAddress, INT32 interruptAddress);
         INT32 getClockSpeed();
         void reset();
+		void LogData();
         INT32 tick();
 /*
         void save(SaveOutputStream os) throws IOException;
@@ -25,6 +27,7 @@ class CP1610 : public Processor
     private:
         void setIndirect(INT32 register, INT32 value);
         INT32 getIndirect(INT32 register);
+		ofstream log;
         void HLT();
         void SDBD();
         void EIS();

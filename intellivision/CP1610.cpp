@@ -3,9 +3,12 @@
 #include <string.h>
 #include "CP1610.h"
 #include "../core/osd/types.h"
+#include <iomanip>
 
 #pragma warning(disable:4786)	// Suppress STL debug info > 255 chars messages
 using namespace std;
+
+ofstream CP1610_log;
 
 CP1610::CP1610()
 {
@@ -31,6 +34,23 @@ void CP1610::init(MemoryBus16Bit* m, SignalLine* intrmLine, SignalLine* busRqLin
     this->interruptAddress = interruptAddress;
 }
 
+void CP1610::LogData() {
+	if (!log.is_open())
+		log.open("log_CP1610.txt");
+	for (int reg = 0; reg <= 5; reg++)
+		log << "R" << reg << " = " << uppercase << hex << setw(4) << setfill('0') << r[reg] << endl;
+	log << "SP = " << uppercase << hex << setw(4) << setfill('0') << r[6] << endl;
+	log << "PC = " << uppercase << hex << setw(4) << setfill('0') << r[7] << endl;
+	log << "S = " << (S ? "True" : "False") << endl;
+	log << "C = " << (C ? "True" : "False") << endl;
+	log << "Z = " << (Z ? "True" : "False") << endl;
+	log << "O = " << (O ? "True" : "False") << endl;
+	log << "I = " << (I ? "True" : "False") << endl;
+	log << "D = " << (D ? "True" : "False") << endl;
+	log << "------" << endl;
+	log << endl;
+}
+
 INT32 CP1610::getClockSpeed() {
     return 3579545;
 }
@@ -44,6 +64,7 @@ void CP1610::reset() {
     for (INT32 i = 0; i < 7; i++)
         r[i] = 0;
     r[7] = resetAddress;
+	LogData();
 }
 
 /**
@@ -985,6 +1006,7 @@ void CP1610::decode(INT32 op) {
     INT32 registerNum;
     INT32 interrupt;
     INT32 target;
+	log << uppercase << hex << setw(3) << setfill('0') << op << endl;
     switch (op) {
         case 0x0000:
             HLT();
@@ -4085,5 +4107,6 @@ void CP1610::decode(INT32 op) {
             XOR_ind(7, 7);
             break;
     }
+	LogData();
 }
 
