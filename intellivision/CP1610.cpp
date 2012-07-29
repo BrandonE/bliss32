@@ -97,6 +97,7 @@ INT32 CP1610::tick()
     decode(memoryBus->peek(r[7]));
     if (oldD && D)
         D = FALSE;
+	LogData();
 
     return (usedCycles<<2);
 }
@@ -4212,6 +4213,5 @@ void CP1610::decode(INT32 op) {
             XOR_ind(7, 7);
             break;
     }
-	LogData();
 }
 
