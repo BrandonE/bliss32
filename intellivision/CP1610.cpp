@@ -45,6 +45,10 @@ void CP1610::LogData() {
 	log << "O = " << (O ? "True" : "False") << endl;
 	log << "I = " << (I ? "True" : "False") << endl;
 	log << "D = " << (D ? "True" : "False") << endl;
+	log << "INTRM = " << (intrmLine->isHigh ? "True" : "False") << endl;
+	log << "BUSRQ = " << (busRqLine->isHigh ? "True" : "False") << endl;
+	log << "BUSAK = " << (busAkLine->isHigh ? "True" : "False") << endl;
+	log << "MSYNC = False" << endl;
 }
 
 INT32 CP1610::getClockSpeed() {
