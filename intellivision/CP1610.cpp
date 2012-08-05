@@ -45,8 +45,6 @@ void CP1610::LogData() {
 	log << "O = " << (O ? "True" : "False") << endl;
 	log << "I = " << (I ? "True" : "False") << endl;
 	log << "D = " << (D ? "True" : "False") << endl;
-	log << "------" << endl;
-	log << endl;
 }
 
 INT32 CP1610::getClockSpeed() {
@@ -1113,6 +1111,8 @@ void CP1610::decode(INT32 op) {
     INT32 registerNum;
     INT32 interrupt;
     INT32 target;
+	log << "------" << endl;
+	log << endl;
     switch (op) {
         case 0x0000:
             HLT();
