@@ -2,6 +2,7 @@
 #include <string.h>
 #include "ProcessorBus.h"
 #include "AudioMixer.h"
+#include "../intellivision/CP1610.h"
 
 ProcessorBus::ProcessorBus()
 {
@@ -33,6 +34,8 @@ void ProcessorBus::reset()
         processorTickFactors[i] = (totalClockSpeed /
                 ((UINT64)processors[i]->getClockSpeed()));
     }
+	CP1610 *cpu = (CP1610 *)processors[1];
+	cpu->LogData();
 }
 
 void ProcessorBus::addProcessor(Processor* p)
@@ -75,6 +78,8 @@ void ProcessorBus::tick()
     //move the audio mixer clock forward by the tick delta amount
     audioMixer->clock += tickDelta;
 
+	bool log = false;
+
     for (i = 0; i < processorCount; i++) {
         //skip this processor if it has been idled
         if (!processorsIdle[i]) {
@@ -86,14 +91,20 @@ void ProcessorBus::tick()
                 if (processors[i]->isIdle)
                     processorsIdle[i] = TRUE;
                 else
-{
+				{
                     processorTicks[i] = (((UINT64)processors[i]->tick()) *
                                 processorTickFactors[i]);
 //cout << "ticked: " << i << "   now at: " << ((INT32)processorTicks[i]) << "\n";
-}
+					if (1 == i)
+						log = true;
+				}
             }
         }
     }
+	if (log) {
+		CP1610 *cpu = (CP1610 *)processors[1];
+		cpu->LogData();
+	}
 }
 
 UINT64 lcm(UINT64 a, UINT64 b) {

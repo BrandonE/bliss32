@@ -64,7 +64,6 @@ void CP1610::reset() {
     for (INT32 i = 0; i < 7; i++)
         r[i] = 0;
     r[7] = resetAddress;
-	LogData();
 }
 
 /**
@@ -78,6 +77,9 @@ INT32 CP1610::tick()
         busAkLine->isHigh = FALSE;
         //sync up and run again with the STIC
         isIdle = TRUE;
+		log << "------" << endl;
+		log << endl;
+		log << "Idle" << endl;
         return 4;
     }
     else
@@ -88,6 +90,9 @@ INT32 CP1610::tick()
         interruptible = FALSE;
         setIndirect(6, r[7]);
         r[7] = interruptAddress;
+		log << "------" << endl;
+		log << endl;
+		log << "Interrupt" << endl;
         return 28;
     }
 
@@ -99,7 +104,6 @@ INT32 CP1610::tick()
     decode(memoryBus->peek(r[7]));
     if (oldD && D)
         D = FALSE;
-	LogData();
 
     return (usedCycles<<2);
 }
