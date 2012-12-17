@@ -8,6 +8,8 @@
 #pragma warning(disable:4786)	// Suppress STL debug info > 255 chars messages
 using namespace std;
 
+INT32 TotalExecutedCycles = 0;
+
 CP1610::CP1610()
 {
 	resetAddress = 0;
@@ -34,9 +36,15 @@ void CP1610::init(MemoryBus16Bit* m, SignalLine* intrmLine, SignalLine* busRqLin
 
 void CP1610::LogData() {
 	if (!log.is_open())
+	{
 		log.open("log_CP1610.txt");
+	}
+
+	log << "Total Executed Cycles = " << dec << TotalExecutedCycles << endl;
 	for (int reg = 0; reg <= 5; reg++)
+	{
 		log << "R" << reg << " = " << uppercase << hex << setw(4) << setfill('0') << r[reg] << endl;
+	}
 	log << "SP = " << uppercase << hex << setw(4) << setfill('0') << r[6] << endl;
 	log << "PC = " << uppercase << hex << setw(4) << setfill('0') << r[7] << endl;
 	log << "S = " << (S ? "True" : "False") << endl;
@@ -48,7 +56,7 @@ void CP1610::LogData() {
 	log << "INTRM = " << (intrmLine->isHigh ? "True" : "False") << endl;
 	log << "BUSRQ = " << (busRqLine->isHigh ? "True" : "False") << endl;
 	log << "BUSAK = " << (busAkLine->isHigh ? "True" : "False") << endl;
-	log << "MSYNC = False" << endl;
+	// log << "MSYNC = False" << endl;
 }
 
 INT32 CP1610::getClockSpeed() {
@@ -80,6 +88,7 @@ INT32 CP1610::tick()
 		log << "------" << endl;
 		log << endl;
 		log << "Idle" << endl;
+		TotalExecutedCycles += 4;
         return 4;
     }
     else
@@ -93,6 +102,7 @@ INT32 CP1610::tick()
 		log << "------" << endl;
 		log << endl;
 		log << "Interrupt" << endl;
+		TotalExecutedCycles += 28;
         return 28;
     }
 
@@ -105,6 +115,7 @@ INT32 CP1610::tick()
     if (oldD && D)
         D = FALSE;
 
+	TotalExecutedCycles += usedCycles;
     return (usedCycles<<2);
 }
 
